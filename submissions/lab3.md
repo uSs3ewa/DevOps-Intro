@@ -87,9 +87,22 @@ Branch protection needs to be configured manually via GitHub UI:
 6. This is better than requiring individual matrix jobs because the matrix can change without breaking branch protection
 
 ### Next Steps for User
-1. Open the PR from feature/lab3 to main using the GitHub UI
-2. Monitor the CI runs to confirm they pass
+1. Open the PR from feature/lab3 to main using: https://github.com/uSs3ewa/DevOps-Intro/pull/new/feature/lab3
+2. Monitor the CI runs to confirm they pass (check the Actions tab)
 3. Configure branch protection as described above
 4. Test that a failing commit cannot merge with branch protection enabled
 5. Add actual CI run links and screenshots to this document
 6. Submit the PR URL via Moodle
+
+### Implementation Summary
+The CI pipeline has been fully implemented with:
+- ✅ GitHub Actions workflow in `.github/workflows/ci.yml`
+- ✅ Three independent jobs: vet, test, lint
+- ✅ Build matrix for Go 1.23 and 1.24 on vet and test jobs
+- ✅ Go module and build caching enabled
+- ✅ Path filtering to skip CI on docs-only changes
+- ✅ SHA-pinned actions (full 40-character commits)
+- ✅ Least privilege permissions (contents: read)
+- ✅ Aggregation job (ci-ok) for branch protection compatibility
+- ✅ Deliberate failure testing implemented (commits 6da4384 and af83241)
+- ✅ Comprehensive documentation with design question answers
