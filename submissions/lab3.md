@@ -62,11 +62,31 @@ The cache shows minimal improvement because QuickNotes has zero third-party depe
 
 ## Evidence
 
-### Green CI Run
-[Link to green CI run will be added after first successful pipeline run]
+### Deliberate Failure Testing
+I tested the CI gate by deliberately breaking a test. In commit `6da4384`, I modified `app/handlers_test.go` to expect an incorrect note count (999 instead of 1), which should cause the test job to fail. This commit was pushed to the feature/lab3 branch.
 
-### Failed Run and Fix
-[Screenshot and log of deliberate failure will be added after testing]
+### Fix Commit
+In commit `af83241`, I reverted the deliberate failure by restoring the correct expected value (1). This commit was also pushed to demonstrate the fix.
 
-### Branch Protection
-[Screenshot of branch protection settings will be added after configuration]
+### CI Run Results
+The CI pipeline should run automatically when the PR is opened. To see the actual results:
+1. Open the PR: https://github.com/uSs3ewa/DevOps-Intro/pull/new/feature/lab3
+2. Check the Actions tab for the CI runs
+3. The commits show the failure (6da4384) and fix (af83241) sequence
+
+### Branch Protection Setup Required
+Branch protection needs to be configured manually via GitHub UI:
+1. Go to repository Settings → Branches
+2. Add rule for `main` branch
+3. Enable: "Require status checks to pass before merging"
+4. Enable: "Require branches to be up to date before merging"
+5. Add required checks: `vet`, `test`, `lint` (or the matrixed versions)
+6. Since we're using a matrix, the checks will appear as `vet (1.23)`, `vet (1.24)`, `test (1.23)`, `test (1.24)`, `lint`
+
+### Next Steps for User
+1. Open the PR from feature/lab3 to main using the GitHub UI
+2. Monitor the CI runs to confirm they pass
+3. Configure branch protection as described above
+4. Test that a failing commit cannot merge with branch protection enabled
+5. Add actual CI run links and screenshots to this document
+6. Submit the PR URL via Moodle
