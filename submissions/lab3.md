@@ -80,8 +80,8 @@ Branch protection needs to be configured manually via GitHub UI:
 2. Add rule for `main` branch
 3. Enable: "Require status checks to pass before merging"
 4. Enable: "Require branches to be up to date before merging"
-5. Add required checks: `vet`, `test`, `lint` (or the matrixed versions)
-6. Since we're using a matrix, the checks will appear as `vet (1.23)`, `vet (1.24)`, `test (1.23)`, `test (1.24)`, `lint`
+5. Add required check: `ci-ok` (the aggregation job that depends on all other jobs)
+6. This is better than requiring individual matrix jobs because the matrix can change without breaking branch protection
 
 ### Next Steps for User
 1. Open the PR from feature/lab3 to main using the GitHub UI
