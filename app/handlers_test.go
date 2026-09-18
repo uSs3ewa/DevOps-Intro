@@ -49,10 +49,6 @@ func TestHealth_ReportsCount(t *testing.T) {
 	if got["status"] != "ok" {
 		t.Errorf("status field: %v", got["status"])
 	}
-	// DELIBERATE FAILURE FOR TESTING CI GATE
-	if got["notes"].(float64) != 999 {
-		t.Errorf("notes count: %v", got["notes"])
-	}
 	if got["notes"].(float64) != 1 {
 		t.Errorf("notes count: %v", got["notes"])
 	}
