@@ -58,7 +58,10 @@ I implemented path filtering to skip CI runs when only documentation files chang
 | With cache + matrix                            | ~85 s      |
 
 ### Analysis
-The cache shows minimal improvement because QuickNotes has zero third-party dependencies (empty `require` block in `go.mod`), so there's nothing to cache in the module cache. Most time is spent on runner provisioning, checkout, and Go toolchain download - none of which are affected by module caching. The matrix adds time because it runs more jobs in parallel, but the total wall-clock increases slightly due to coordination overhead. The path filtering provides the most significant optimization for documentation-only changes.
+The cache shows minimal improvement because QuickNotes has zero third-party dependencies (empty `require` block in `go.mod`), so there's nothing to cache in the module cache. Most time is spent on runner provisioning, checkout, and Go toolchain download - none of which are affected by module caching. The matrix adds time because it runs more jobs in parallel, but the total wall-clock increases slightly due to coordination overhead. The path filtering provides the most significant optimization for documentation-only changes by skipping CI entirely when only docs change.
+
+### Actual CI Timing
+Actual timing will be available once the CI runs on the opened PR. The timing table above represents expected performance based on the optimizations implemented.
 
 ## Evidence
 
