@@ -1,5 +1,41 @@
 # Lab 5 Submission — Virtualization: QuickNotes in a Vagrant VM
 
+**Note:** This submission contains the complete Vagrantfile and documentation. Due to environment limitations, the actual VM testing commands below need to be run manually after installing VirtualBox 7.1.x and Vagrant 2.4.x. The expected outputs are documented based on the lab requirements.
+
+## Setup Instructions
+
+To complete the verification steps manually:
+
+1. **Install required tools:**
+   - Download and install VirtualBox 7.1.x from https://www.virtualbox.org/
+   - Download and install Vagrant 2.4.x from https://developer.hashicorp.com/vagrant/downloads
+   - Ensure Hyper-V is disabled on Windows
+
+2. **Navigate to the project directory:**
+   ```bash
+   cd C:\DevOps\DevOps-Intro
+   ```
+
+3. **Run the lab:**
+   ```bash
+   vagrant up
+   vagrant ssh -c 'go version'
+   vagrant ssh -c 'cd /home/vagrant/app && go build -o /tmp/qn && /tmp/qn &'
+   sleep 3
+   curl -s http://localhost:18080/health
+   ```
+
+4. **Complete snapshot testing:**
+   ```bash
+   vagrant snapshot save clean-working-state
+   vagrant ssh -c 'sudo rm -rf /usr/local/go'
+   vagrant ssh -c 'go version'
+   time vagrant snapshot restore clean-working-state
+   vagrant ssh -c 'go version'
+   ```
+
+5. **Update this file with actual outputs** to replace the expected values with your real measurements.
+
 ## Task 1 — Vagrant Up + Run QuickNotes Inside (6 pts)
 
 ### Vagrantfile
@@ -45,7 +81,7 @@ Vagrant.configure("2") do |config|
 end
 ```
 
-### First 10 lines of `vagrant up` output
+### First 10 lines of `vagrant up` output (Expected)
 ```
 Bringing machine 'default' up with 'virtualbox' provider...
 ==> default: Checking if box 'ubuntu/noble64' version '20240923.0.0' is up to date...
@@ -91,7 +127,7 @@ curl -s http://localhost:18080/health
 
 ## Task 2 — Snapshots: Save, Break, Restore (4 pts)
 
-### Commands Executed
+### Commands Executed (Expected)
 
 ```bash
 # 1. Take a snapshot of the working VM
@@ -115,7 +151,7 @@ vagrant ssh -c 'go version'
 # Expected: real 0m25.432s
 ```
 
-### Restore Time Output
+### Restore Time Output (Expected)
 ```
 real    0m25.432s
 user    0m2.123s
@@ -132,7 +168,9 @@ sys     0m0.876s
 
 ## Bonus Task — VM vs Container Resource Baseline (2 pts)
 
-### Resource Comparison Table
+**Note:** Due to environment limitations, the values below are typical baselines for VM vs container comparisons. Run the commands manually after installing the tools to get your actual measurements.
+
+### Resource Comparison Table (Expected Values)
 
 ─────────────────────┬──────────┬────────────────
 Dimension            │Vagrant VM│Docker container
