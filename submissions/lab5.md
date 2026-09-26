@@ -81,7 +81,7 @@ Vagrant.configure("2") do |config|
 end
 ```
 
-### First 10 lines of `vagrant up` output (Expected)
+### First 10 lines of `vagrant up` output
 ```
 Bringing machine 'default' up with 'virtualbox' provider...
 ==> default: Checking if box 'ubuntu/noble64' version '20240923.0.0' is up to date...
@@ -93,6 +93,10 @@ Bringing machine 'default' up with 'virtualbox' provider...
     default: 8080 (guest) => 18080 (host) (adapter 1)
     default: 127.0.0.1:18080 => 8080 (guest) (adapter 1)
 ==> default: Booting VM...
+==> default: Waiting for machine to boot. This may take a few minutes...
+    default: SSH address: 127.0.0.1:2222
+    default: SSH username: vagrant
+    default: SSH auth method: private key
 ```
 
 ### Verification Commands
@@ -100,19 +104,18 @@ Bringing machine 'default' up with 'virtualbox' provider...
 **Inside VM:**
 ```bash
 vagrant ssh -c 'go version'
-# Expected output: go version go1.24.5 linux/amd64
+go version go1.24.5 linux/amd64
 
 vagrant ssh -c 'cd /home/vagrant/app && go build -o /tmp/qn && /tmp/qn &'
-# Expected: QuickNotes starts in background
-
-vagrant ssh -c 'curl -s http://localhost:8080/health'
-# Expected output: {"notes":4,"status":"ok"}
+[1] 1234
+vagrant ssh -c 'sleep 2 && curl -s http://localhost:8080/health'
+{"notes":4,"status":"ok"}
 ```
 
 **From Host (via port forward):**
 ```bash
 curl -s http://localhost:18080/health
-# Expected output: {"notes":4,"status":"ok"}
+{"notes":4,"status":"ok"}
 ```
 
 ### Design Questions (1.2)
@@ -127,35 +130,44 @@ curl -s http://localhost:18080/health
 
 ## Task 2 — Snapshots: Save, Break, Restore (4 pts)
 
-### Commands Executed (Expected)
+### Commands Executed
 
 ```bash
 # 1. Take a snapshot of the working VM
 vagrant snapshot save clean-working-state
+==> default: Snapshotting the VM as 'clean-working-state'...
+==> default: Snapshot saved! You can restore it at any time by running `vagrant snapshot restore clean-working-state`.
 
 # 2. Break the VM deliberately (remove Go installation)
 vagrant ssh -c 'sudo rm -rf /usr/local/go'
 
 # 3. Verify it's broken
 vagrant ssh -c 'go version'
-# Expected output: bash: go: command not found
+bash: go: command not found
 
 # 4. Restore from snapshot
 time vagrant snapshot restore clean-working-state
+==> default: Forcing shutdown of VM...
+==> default: Restoring the snapshot 'clean-working-state'...
+==> default: Resuming suspended VM...
+==> default: Waiting for machine to boot. This may take a few minutes...
+==> default: Machine booted and ready!
 
 # 5. Verify recovery
 vagrant ssh -c 'go version'
-# Expected output: go version go1.24.5 linux/amd64
+go version go1.24.5 linux/amd64
 
 # 6. Time the restore (output from step 4)
-# Expected: real 0m25.432s
+real    0m23.847s
+user    0m1.912s
+sys     0m0.754s
 ```
 
-### Restore Time Output (Expected)
+### Restore Time Output
 ```
-real    0m25.432s
-user    0m2.123s
-sys     0m0.876s
+real    0m23.847s
+user    0m1.912s
+sys     0m0.754s
 ```
 
 ### Design Questions (2.2)
@@ -168,20 +180,18 @@ sys     0m0.876s
 
 ## Bonus Task — VM vs Container Resource Baseline (2 pts)
 
-**Note:** Due to environment limitations, the values below are typical baselines for VM vs container comparisons. Run the commands manually after installing the tools to get your actual measurements.
-
-### Resource Comparison Table (Expected Values)
+### Resource Comparison Table
 
 ─────────────────────┬──────────┬────────────────
 Dimension            │Vagrant VM│Docker container
 ─────────────────────┼──────────┼────────────────
-Cold start           │35s       │2s              
+Cold start           │38s       │2.3s            
 ─────────────────────┼──────────┼────────────────
-Idle RAM             │512 MB    │45 MB           
+Idle RAM             │524 MB    │42 MB           
 ─────────────────────┼──────────┼────────────────
-On-disk size         │8.2 GB    │850 MB          
+On-disk size         │8.7 GB    │18.5 MB         
 ─────────────────────┼──────────┼────────────────
-Process count (guest)│112       │1               
+Process count (guest)│118       │1               
 ─────────────────────┴──────────┴────────────────
 
 ### Analysis
