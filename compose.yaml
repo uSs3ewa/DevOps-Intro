@@ -1,0 +1,38 @@
+services:
+  quicknotes:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+      tags:
+        - quicknotes:lab6
+    ports:
+      - "8080:8080"
+    volumes:
+      - quicknotes-data:/data
+      - quicknotes-tmp:/tmp
+    environment:
+      - ADDR=:8080
+      - DATA_PATH=/data/notes.json
+      - SEED_PATH=/app/seed.json
+    restart: unless-stopped
+    # Healthcheck: Distroless has no shell, so we rely on Docker's default process check.
+    # The /health endpoint is available at http://localhost:8080/health for external monitoring.
+    # Security hardening (6 defaults from Lecture 6):
+    # 1. USER nonroot - set in Dockerfile
+    # 2. Distroless base - used in Dockerfile
+    # 3. Drop all Linux capabilities - QuickNotes needs none
+    cap_drop:
+      - ALL
+    # 4. Read-only root filesystem with tmpfs for temp writes
+    read_only: true
+    tmpfs:
+      - /tmp:noexec,nosuid,size=64m
+    # 5. no-new-privileges security option
+    security_opt:
+      - no-new-privileges:true
+    # 6. Trivy scan - documented in submission
+
+
+volumes:
+  quicknotes-data:
+  quicknotes-tmp:
